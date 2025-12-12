@@ -1,0 +1,12 @@
+---
+BasedOnStyle: Google
+IndentWidth: 2
+UseTab: Never
+ColumnLimit: 100
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+IndentCaseLabels: true
+BreakBeforeBraces: Attach
+PointerAlignment: Left
+AccessModifierOffset: -2
+IndentAccessModifiers: true
