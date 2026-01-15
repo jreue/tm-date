@@ -57,18 +57,16 @@ void EspNowHelper::sendConnected() {
 }
 
 void EspNowHelper::updateDate(uint8_t month, uint8_t day, uint16_t year) {
-  if (month != message.month || day != message.day || year != message.year) {
-    Serial.println("Sending Data Message...");
+  Serial.println("Sending Data Message...");
 
-    message.deviceId = deviceId;
-    message.deviceType = DEVICE_TYPE_DATE;
-    message.messageType = MSG_TYPE_DATA;
-    message.month = month;
-    message.day = day;
-    message.year = year;
+  message.deviceId = deviceId;
+  message.deviceType = DEVICE_TYPE_DATE;
+  message.messageType = MSG_TYPE_DATA;
+  message.month = month;
+  message.day = day;
+  message.year = year;
 
-    sendMessage();
-  }
+  sendMessage();
 }
 
 void EspNowHelper::sendMessage() {
