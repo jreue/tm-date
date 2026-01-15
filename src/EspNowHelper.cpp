@@ -1,10 +1,6 @@
 #include "EspNowHelper.h"
 
 EspNowHelper::EspNowHelper() : receiverAddress(nullptr) {
-  message.deviceId = 0;
-  message.month = 9;
-  message.day = 21;
-  message.year = 2006;
 }
 
 void EspNowHelper::begin(uint8_t* hubMacAddress, int dateId) {
@@ -13,7 +9,7 @@ void EspNowHelper::begin(uint8_t* hubMacAddress, int dateId) {
 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
-  Serial.printf("Date MAC Address: %s\n", WiFi.macAddress().c_str());
+  Serial.printf("MAC Address: %s\n", WiFi.macAddress().c_str());
 
   Serial.println("Initializing ESP-NOW...");
   if (esp_now_init() != ESP_OK) {
@@ -46,30 +42,7 @@ void EspNowHelper::handleESPNowDataSent(const uint8_t* mac_addr, esp_now_send_st
   Serial.println("------------------------");
 }
 
-void EspNowHelper::sendConnected() {
-  Serial.println("Sending Connected Message...");
-
-  message.deviceId = deviceId;
-  message.deviceType = DEVICE_TYPE_DATE;
-  message.messageType = MSG_TYPE_CONNECT;
-
-  sendMessage();
-}
-
-void EspNowHelper::updateDate(uint8_t month, uint8_t day, uint16_t year) {
-  Serial.println("Sending Data Message...");
-
-  message.deviceId = deviceId;
-  message.deviceType = DEVICE_TYPE_DATE;
-  message.messageType = MSG_TYPE_DATA;
-  message.month = month;
-  message.day = day;
-  message.year = year;
-
-  sendMessage();
-}
-
-void EspNowHelper::sendMessage() {
+void EspNowHelper::sendMessage(EspNowHeader& message, size_t messageSize) {
   Serial.println("  → Preparing message:");
   Serial.print("      Device ID: ");
   Serial.println(message.deviceId);
@@ -78,14 +51,7 @@ void EspNowHelper::sendMessage() {
   Serial.print("      Message Type: ");
   Serial.println(message.messageType);
 
-  Serial.print("      Date: ");
-  Serial.print(message.month);
-  Serial.print("/");
-  Serial.print(message.day);
-  Serial.print("/");
-  Serial.println(message.year);
-
-  esp_err_t result = esp_now_send(receiverAddress, (uint8_t*)&message, sizeof(message));
+  esp_err_t result = esp_now_send(receiverAddress, (uint8_t*)&message, messageSize);
 
   if (result == ESP_OK) {
     Serial.println("  → Message queued for sending");
@@ -115,4 +81,38 @@ void EspNowHelper::sendMessage() {
         break;
     }
   }
+}
+
+void EspNowHelper::sendDateConnected() {
+  Serial.println("Sending Date Connected Message...");
+
+  DateMessage message;
+  message.deviceId = deviceId;
+  message.deviceType = DEVICE_TYPE_DATE;
+  message.messageType = MSG_TYPE_CONNECT;
+  message.month = 0;
+  message.day = 0;
+  message.year = 0;
+
+  sendMessage((EspNowHeader&)message, sizeof(message));
+}
+
+void EspNowHelper::sendDateUpdated(uint8_t month, uint8_t day, uint16_t year) {
+  Serial.println("Sending Date Updated Message...");
+
+  DateMessage message;
+  message.deviceId = deviceId;
+  message.deviceType = DEVICE_TYPE_DATE;
+  message.messageType = MSG_TYPE_DATA;
+  message.month = month;
+  message.day = day;
+  message.year = year;
+
+  Serial.print("  → Date: ");
+  Serial.print(month);
+  Serial.print("/");
+  Serial.print(day);
+  Serial.print("/");
+  Serial.println(year);
+  sendMessage((EspNowHeader&)message, sizeof(message));
 }

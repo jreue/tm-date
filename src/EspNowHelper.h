@@ -10,14 +10,13 @@ class EspNowHelper {
     EspNowHelper();
 
     void begin(uint8_t* hubMacAddress, int deviceId);
-    void sendConnected();
-    void updateDate(uint8_t month, uint8_t day, uint16_t year);
+    void sendDateConnected();
+    void sendDateUpdated(uint8_t month, uint8_t day, uint16_t year);
 
   private:
     uint8_t* receiverAddress;
     int deviceId;
-    DateMessage message;
 
-    void sendMessage();
+    void sendMessage(EspNowHeader& message, size_t messageSize);
     static void handleESPNowDataSent(const uint8_t* mac_addr, esp_now_send_status_t status);
 };

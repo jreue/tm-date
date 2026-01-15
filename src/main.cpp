@@ -39,7 +39,7 @@ void setup() {
   yyyyDisplay.writeDisplay();
 
   espNowHelper.begin(hubAddress, DEVICE_ID);
-  espNowHelper.sendConnected();
+  espNowHelper.sendDateConnected();
 }
 
 void loop() {
@@ -74,7 +74,7 @@ void handleEncoderChange() {
   }
   Serial.println(dateEncoder.getFormattedDate());
 
-  espNowHelper.updateDate(dateEncoder.getMonth(), dateEncoder.getDay(), dateEncoder.getYear());
+  espNowHelper.sendDateUpdated(dateEncoder.getMonth(), dateEncoder.getDay(), dateEncoder.getYear());
 }
 
 void handleEncoderPressed() {
