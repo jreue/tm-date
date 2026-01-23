@@ -1,5 +1,6 @@
 #include <Adafruit_LEDBackpack.h>
 #include <Arduino.h>
+#include <shared_hardware_config.h>
 
 #include "DateEncoder.h"
 #include "EspNowHelper.h"
