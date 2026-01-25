@@ -9,6 +9,8 @@
 // Forward declarations
 void handleEncoderChange();
 void handleEncoderPressed();
+void handleDateMessage(const DateMessage& msg);
+
 void clear();
 void setMonthDay(int monthDay);
 void setYear(int year);
@@ -20,6 +22,7 @@ DateEncoder dateEncoder(ENCODER_PIN_DT, ENCODER_PIN_CLK, ENCODER_PIN_SW);
 bool mmddDisplayConnected = false;
 bool yyyyDisplayConnected = false;
 bool isCleared = false;
+bool shouldClear = false;
 
 uint8_t hubAddress[] = HUB_MAC_ADDRESS;
 EspNowHelper espNowHelper;
@@ -41,7 +44,6 @@ void setup() {
   if (mmddDisplayConnected) {
     Serial.println("  ✓ MMDD Display connected");
     mmddDisplay.setBrightness(DISPLAY_BRIGHTNESS);
-    // setMonthDay(dateEncoder.getMonthDay());
   } else {
     Serial.println("  ✗ MMDD Display not found");
   }
@@ -49,7 +51,6 @@ void setup() {
   if (yyyyDisplayConnected) {
     Serial.println("  ✓ YYYY Display connected");
     yyyyDisplay.setBrightness(DISPLAY_BRIGHTNESS);
-    // setYear(dateEncoder.getYear());
   } else {
     Serial.println("  ✗ YYYY Display not found");
   }
@@ -58,10 +59,17 @@ void setup() {
 
   espNowHelper.begin(DEVICE_ID);
   espNowHelper.addPeer(hubAddress);
+  espNowHelper.registerDateMessageHandler(handleDateMessage);
   espNowHelper.sendDateConnected(hubAddress);
 }
 
 void loop() {
+  if (shouldClear) {
+    Serial.println("Clearing Displays...");
+    clear();
+    shouldClear = false;
+  }
+
   dateEncoder.update();
   if (dateEncoder.hasChanged()) {
     handleEncoderChange();
@@ -105,6 +113,17 @@ void handleEncoderPressed() {
   Serial.println(dateEncoder.getFormattedDate());
 }
 
+void handleDateMessage(const DateMessage& msg) {
+  Serial.print("Received Date Message: ");
+  Serial.print(msg.month);
+  Serial.print("-");
+  Serial.print(msg.day);
+  Serial.print("-");
+  Serial.println(msg.year);
+
+  shouldClear = true;
+}
+
 void clear() {
   setMonthDay(0);
   setYear(0);
@@ -114,7 +133,12 @@ void clear() {
 void setMonthDay(int monthDay) {
   if (mmddDisplayConnected) {
     if (monthDay == 0) {
-      mmddDisplay.print("----");
+      // Render ---- for cleared state
+      mmddDisplay.clear();
+      mmddDisplay.writeDigitRaw(0, 0x40);
+      mmddDisplay.writeDigitRaw(1, 0x40);
+      mmddDisplay.writeDigitRaw(3, 0x40);
+      mmddDisplay.writeDigitRaw(4, 0x40);
     } else {
       mmddDisplay.print(monthDay);
     }
@@ -125,7 +149,12 @@ void setMonthDay(int monthDay) {
 void setYear(int year) {
   if (yyyyDisplayConnected) {
     if (year == 0) {
-      yyyyDisplay.print("----");
+      // Render ---- for cleared state
+      yyyyDisplay.clear();
+      yyyyDisplay.writeDigitRaw(0, 0x40);
+      yyyyDisplay.writeDigitRaw(1, 0x40);
+      yyyyDisplay.writeDigitRaw(3, 0x40);
+      yyyyDisplay.writeDigitRaw(4, 0x40);
     } else {
       yyyyDisplay.print(year);
     }
