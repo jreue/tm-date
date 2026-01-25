@@ -36,7 +36,7 @@ class DateEncoder {
     static const int DAY_MIN = 1;
     static const int DAY_MAX = 31;
     static const int YEAR_MIN = 1900;
-    static const int YEAR_MAX = 2050;
+    static const int YEAR_MAX = 2100;
 
     void updateEncoderRange();
     void switchField();
@@ -48,6 +48,7 @@ class DateEncoder {
     ~DateEncoder();
 
     void begin(int month, int day, int year);
+    void reset(int month, int day, int year);
     void update();
 
     bool hasChanged();

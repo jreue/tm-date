@@ -31,12 +31,13 @@ void DateEncoder::begin(int month, int day, int year) {
   // Setup button with internal pullup
   pinMode(switchPin, INPUT_PULLUP);
 
-  // Store initial date
+  reset(month, day, year);
+}
+
+void DateEncoder::reset(int month, int day, int year) {
   currentMonth = constrain(month, MONTH_MIN, MONTH_MAX);
   currentDay = constrain(day, DAY_MIN, DAY_MAX);
   currentYear = constrain(year, YEAR_MIN, YEAR_MAX);
-
-  // Start in month editing mode
   currentField = FIELD_MONTH;
   updateEncoderRange();
 }
