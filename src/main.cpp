@@ -56,8 +56,9 @@ void setup() {
 
   clear();
 
-  espNowHelper.begin(hubAddress, DEVICE_ID);
-  espNowHelper.sendDateConnected();
+  espNowHelper.begin(DEVICE_ID);
+  espNowHelper.addPeer(hubAddress);
+  espNowHelper.sendDateConnected(hubAddress);
 }
 
 void loop() {
@@ -95,7 +96,8 @@ void handleEncoderChange() {
 
   Serial.println(dateEncoder.getFormattedDate());
 
-  espNowHelper.sendDateUpdated(dateEncoder.getMonth(), dateEncoder.getDay(), dateEncoder.getYear());
+  espNowHelper.sendDateUpdated(hubAddress, dateEncoder.getMonth(), dateEncoder.getDay(),
+                               dateEncoder.getYear());
 }
 
 void handleEncoderPressed() {
